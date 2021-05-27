@@ -17,38 +17,23 @@
 
 <body>
 
-    <div class="container-fluid mt-5">
-        <div class="video row">
+    <template>
+        <div data-id="" class="video-wrapper row">
             <div class="col-md-6">
-                <video id="v1" class="w-100 border border-primary" src="videos/v1.mp4"></video>
-                <input data-id="v1" class="form-range" type="range" min="0" max="150" value="30">
+                <video controls id="" class="w-100 border border-primary" src="#"></video>
+                <input data-id="" data-action="from" class="from form-range" type="range" min="0" max="150" value="30"
+                    step="1">
+                <input data-id="" data-action="to" class="to form-range" type="range" min="0" max="150" value="30"
+                    step="1">
             </div>
             <div class="col-md-6">
-                <button data-id="v1" data-action="play" class="play btn btn-primary">Play</button>
-                <button data-id="v1" data-action="pause" class="play btn btn-primary">Pause</button>
-            </div>
-        </div>
-        <div class="video row">
-            <div class="col-md-6">
-                <video id="v1" class="w-100 border border-primary" src="videos/v1.mp4"></video>
-                <input data-id="v1" class="form-range" type="range" min="0" max="150" value="30">
-            </div>
-            <div class="col-md-6">
-                <button data-id="v1" data-action="play" class="play btn btn-primary">Play</button>
-                <button data-id="v1" data-action="pause" class="play btn btn-primary">Pause</button>
+                <button data-id="" data-action="play" class="play btn btn-primary">Play</button>
+                <button data-id="" data-action="pause" class="play btn btn-primary">Pause</button>
             </div>
         </div>
-        <div class="video row">
-            <div class="col-md-6">
-                <video id="v1" class="w-100 border border-primary" src="videos/v1.mp4"></video>
-                <input data-id="v1" class="form-range" type="range" min="0" max="150" value="30">
-            </div>
-            <div class="col-md-6">
-                <button data-id="v1" data-action="play" class="play btn btn-primary">Play</button>
-                <button data-id="v1" data-action="pause" class="play btn btn-primary">Pause</button>
-            </div>
-        </div>
-    </div>
+    </template>
+
+    <div id="root" class="container-fluid mt-5"></div>
 
 
 </body>

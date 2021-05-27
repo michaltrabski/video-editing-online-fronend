@@ -1,37 +1,57 @@
-const videos = document.querySelectorAll("video");
-const videos1 = document.querySelectorAll(".video-1");
-const videos2 = document.querySelectorAll(".video-2");
+(() => {
+  fetch("data.json")
+    .then((res) => res.json())
+    .then((data) => {
+      // console.log(data);
+      getVideos(data);
+    })
+    .catch((err) => console.log(err));
+})();
 
-const activeVideo = document.querySelector(".wrapper__video--active");
+const getVideos = (data) => {
+  const root = document.querySelector("#root");
+  const template = document.querySelector("template");
+  data.forEach((item) => {
+    const templateCopy = template.content.cloneNode(true);
+    const id = item.videoName;
+    const src = item.src;
 
-const btnPlay = document.querySelector(".play");
-const btnPause = document.querySelector(".pause");
-const btnVideo1 = document.querySelector(".btn-video1");
-const btnVideo2 = document.querySelector(".btn-video2");
+    // video
+    const video = templateCopy.querySelector("video");
+    video.src = `videos/${src}`;
 
-videos.forEach((video) => {
-  video.addEventListener("click", function () {
-    // videos.forEach((video) => video.classList.remove("active"));
+    video.onloadedmetadata = function () {
+      const { duration } = video;
+      controls();
+    };
 
-    const clickedVideo = this;
-    console.log(clickedVideo);
+    // // from range
+    // const from = templateCopy.querySelector(".from");
+    // from.setAttribute("data-id", id);
+
+    // // top range
+    // const to = templateCopy.querySelector(".to");
+    // to.setAttribute("data-id", id);
+
+    // // play
+    // const play = templateCopy.querySelector(".play");
+    // play.setAttribute("data-id", id);
+    root.appendChild(templateCopy);
   });
-});
+};
 
-btnPlay.addEventListener("click", () => {
-  videos.forEach((video) => {
-    video.currentTime = 200;
-    video.play();
+const controls = () => {
+  const wrappers = document.querySelectorAll(".video-wrapper");
+
+  wrappers.forEach((wrapper) => {
+    const allVideos = document.querySelectorAll("video");
+    const video = wrapper.querySelector("video");
+
+    const play = wrapper.querySelector(".play");
+    play.addEventListener("click", () => {
+      allVideos.forEach((video) => video.pause());
+      video.play();
+    });
+    // console.log(id, video, play);
   });
-});
-btnPause.addEventListener("click", () => {
-  videos.forEach((video) => video.pause());
-});
-btnVideo1.addEventListener("click", () => {
-  videos.forEach((video) => video.classList.remove("active"));
-  videos1.forEach((video) => video.classList.add("active"));
-});
-btnVideo2.addEventListener("click", () => {
-  videos.forEach((video) => video.classList.remove("active"));
-  videos2.forEach((video) => video.classList.add("active"));
-});
+};

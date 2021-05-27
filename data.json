@@ -1,1 +1,4 @@
-[{ "video": "v1", "videoName": "v1.mp4", "start": "3", "stop": "35" }]
+[
+  { "videoName": "v1", "src": "v1.mp4", "from": "3", "to": "35" },
+  { "videoName": "v2", "src": "v2.mp4", "from": "3", "to": "35" }
+]
