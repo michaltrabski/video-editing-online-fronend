@@ -15,20 +15,28 @@
     <script defer src="app.js"></script>
 </head>
 
-<body>
+<body class="bg-dark">
+    <div class="small text-light">
+        <pre id="data"></pre>
+    </div>
 
     <template>
-        <div data-id="" class="video-wrapper row">
+        <div class="video-wrapper row">
             <div class="col-md-6">
-                <video controls id="" class="w-100 border border-primary" src="#"></video>
-                <input data-id="" data-action="from" class="from form-range" type="range" min="0" max="150" value="30"
-                    step="1">
-                <input data-id="" data-action="to" class="to form-range" type="range" min="0" max="150" value="30"
-                    step="1">
+                <video controls class="w-100 border border-primary" src="#"></video>
+                <div>
+                    <label class="from-label form-label text-light m-0">1:35</label>
+                    <input class="from form-range" type="range" step="1">
+                </div>
+                <div>
+                    <label class="to-label text-light m-0">2:35</label>
+                    <input class="to form-range" type="range" step="1">
+                </div>
+
             </div>
             <div class="col-md-6">
-                <button data-id="" data-action="play" class="play btn btn-primary">Play</button>
-                <button data-id="" data-action="pause" class="play btn btn-primary">Pause</button>
+                <button class="play btn btn-primary">Play</button>
+                <button class="play btn btn-primary">Pause</button>
             </div>
         </div>
     </template>
