@@ -24,14 +24,14 @@ const controls = (files) => {
   const wrappers = document.querySelectorAll(".video-wrapper");
 
   wrappers.forEach((wrapper) => {
-    const objPlace = wrapper.querySelector(".obj");
-    const obj = { name: "", from: null, to: null };
+    const placeholder = wrapper.querySelector(".obj");
     const allVideos = document.querySelectorAll("video");
     const video = wrapper.querySelector("video");
-    video.onloadedmetadata = function () {
-      obj.name = video.getAttribute("data-video");
 
-      objPlace.innerText = JSON.stringify(obj, null, 2);
+    const name = video.getAttribute("data-video");
+    const obj = getObj(name);
+    video.onloadedmetadata = function () {
+      update(placeholder, obj);
 
       // PLAY
       const play = wrapper.querySelector(".play");
@@ -55,7 +55,7 @@ const controls = (files) => {
         allVideos.forEach((video) => video.pause());
         fromLabel.innerText = time(from.value);
         obj.from = from.value;
-        objPlace.innerText = JSON.stringify(obj, null, 2);
+        update(placeholder, obj);
         video.currentTime = from.value;
       });
       from.addEventListener("click", () => video.play());
@@ -69,7 +69,7 @@ const controls = (files) => {
         allVideos.forEach((video) => video.pause());
         toLabel.innerText = time(to.value);
         obj.to = to.value;
-        objPlace.innerText = JSON.stringify(obj, null, 2);
+        update(placeholder, obj);
         video.currentTime = to.value - 2;
         // toLabel.style.transform = `translateX(${
         //   (to.value / to.clientWidth) * 100
@@ -78,6 +78,19 @@ const controls = (files) => {
       to.addEventListener("click", () => video.play());
     };
   });
+};
+
+const getObj = (name) => {
+  const strFromStorage = localStorage.getItem(name);
+
+  return strFromStorage
+    ? JSON.parse(strFromStorage)
+    : { name, from: null, to: null };
+};
+
+const update = (placeholder, obj) => {
+  placeholder.innerText = JSON.stringify(obj, null, 2);
+  localStorage.setItem(obj.name, JSON.stringify(obj));
 };
 
 const time = (sec) => {
