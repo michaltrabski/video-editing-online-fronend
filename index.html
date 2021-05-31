@@ -21,22 +21,26 @@
     </div>
 
     <template>
-        <div class="video-wrapper row">
-            <div class="col-md-6">
+        <div class="video-wrapper row mb-5  ">
+            <div class="col-md-6 shadow-bottom">
                 <video controls class="w-100 border border-primary" src="#"></video>
-                <div>
-                    <label class="from-label form-label text-light m-0">1:35</label>
+                <div class="position-relative">
+                    <label class="from-label form-label text-light m-0 position-absolute small bg-secondary rounded"
+                        style="top:-15px;">min</label>
                     <input class="from form-range" type="range" step="1">
                 </div>
-                <div>
-                    <label class="to-label text-light m-0">2:35</label>
+                <div class="position-relative">
+                    <label class="to-label form-label text-light m-0 position-absolute small bg-secondary rounded"
+                        style="bottom:-15px;">max</label>
                     <input class="to form-range" type="range" step="1">
                 </div>
 
             </div>
             <div class="col-md-6">
-                <button class="play btn btn-primary">Play</button>
-                <button class="play btn btn-primary">Pause</button>
+                <div><button class="play btn btn-primary">Play</button>
+                    <button class="pause btn btn-primary">Pause</button>
+                </div>
+                <pre class="obj text-light"></pre>
             </div>
         </div>
     </template>

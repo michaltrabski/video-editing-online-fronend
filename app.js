@@ -1,52 +1,49 @@
 (() => {
-  fetch("data.json")
+  fetch("files.json")
     .then((res) => res.json())
-    .then((data) => {
-      getVideos(data);
-      controls(data);
+    .then((files) => {
+      getVideos(files);
+      controls(files);
     })
     .catch((err) => console.log(err));
 })();
 
-const getVideos = (data) => {
+const getVideos = (files) => {
   const root = document.querySelector("#root");
   const template = document.querySelector("template");
-  data.forEach((item) => {
+  files.forEach((file) => {
     const templateCopy = template.content.cloneNode(true);
-    const id = item.videoName;
-    const src = item.src;
-
-    // video
     const video = templateCopy.querySelector("video");
-    video.src = `videos/${src}`;
-
-    // from range
-    const from = templateCopy.querySelector(".from");
-    from.setAttribute("min", 50);
-
-    // // top range
-    // const to = templateCopy.querySelector(".to");
-    // to.setAttribute("data-id", id);
-
-    // // play
-    // const play = templateCopy.querySelector(".play");
-    // play.setAttribute("data-id", id);
+    video.src = `videos/${file.name}`;
+    video.setAttribute("data-video", file.name);
     root.appendChild(templateCopy);
   });
 };
 
-const controls = (data) => {
+const controls = (files) => {
   const wrappers = document.querySelectorAll(".video-wrapper");
 
   wrappers.forEach((wrapper) => {
+    const objPlace = wrapper.querySelector(".obj");
+    const obj = { name: "", from: null, to: null };
     const allVideos = document.querySelectorAll("video");
     const video = wrapper.querySelector("video");
     video.onloadedmetadata = function () {
-      // play button
+      obj.name = video.getAttribute("data-video");
+
+      objPlace.innerText = JSON.stringify(obj, null, 2);
+
+      // PLAY
       const play = wrapper.querySelector(".play");
       play.addEventListener("click", () => {
         allVideos.forEach((video) => video.pause());
         video.play();
+      });
+
+      // PAUSE
+      const pause = wrapper.querySelector(".pause");
+      pause.addEventListener("click", () => {
+        video.pause();
       });
 
       // FROM
@@ -56,10 +53,12 @@ const controls = (data) => {
       from.max = video.duration;
       from.addEventListener("input", () => {
         allVideos.forEach((video) => video.pause());
-        fromLabel.innerText = from.value;
+        fromLabel.innerText = time(from.value);
+        obj.from = from.value;
+        objPlace.innerText = JSON.stringify(obj, null, 2);
         video.currentTime = from.value;
-        video.play();
       });
+      from.addEventListener("click", () => video.play());
 
       // TO
       const to = wrapper.querySelector(".to");
@@ -68,10 +67,21 @@ const controls = (data) => {
       to.max = video.duration;
       to.addEventListener("input", () => {
         allVideos.forEach((video) => video.pause());
+        toLabel.innerText = time(to.value);
+        obj.to = to.value;
+        objPlace.innerText = JSON.stringify(obj, null, 2);
         video.currentTime = to.value - 2;
-        toLabel.innerText = to.value - 2;
-        video.play();
+        // toLabel.style.transform = `translateX(${
+        //   (to.value / to.clientWidth) * 100
+        // }px`;
       });
+      to.addEventListener("click", () => video.play());
     };
   });
+};
+
+const time = (sec) => {
+  const minutes = Math.floor(sec / 60);
+  const seconds = sec - minutes * 60;
+  return `${minutes}:${seconds}`;
 };
