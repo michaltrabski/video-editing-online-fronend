@@ -14,8 +14,8 @@ const getVideos = (files) => {
   files.forEach((file) => {
     const templateCopy = template.content.cloneNode(true);
     const video = templateCopy.querySelector("video");
-    video.src = `videos/${file.name}`;
-    video.setAttribute("data-video", file.name);
+    video.src = `videos/${file.videoName}`;
+    video.setAttribute("data-video", file.videoName);
     root.appendChild(templateCopy);
   });
 };
@@ -25,16 +25,12 @@ const controls = (files) => {
   const masterObj = {};
 
   wrappers.forEach((wrapper, i) => {
-    // wrapper.addEventListener("click", () => {
-    //   console.log("change => recreate list");
-    //   console.log(videoObj);
-    // });
     const placeholder = wrapper.querySelector(".obj");
     const allVideos = document.querySelectorAll("video");
     const video = wrapper.querySelector("video");
 
-    const name = video.getAttribute("data-video");
-    const videoObj = getObj(name);
+    const videoName = video.getAttribute("data-video");
+    const videoObj = getObj(videoName);
     videoObj.order = i;
     video.onloadedmetadata = function () {
       updateObj(placeholder, videoObj, masterObj);
@@ -47,10 +43,11 @@ const controls = (files) => {
 
       const fromLabel = wrapper.querySelector(".from-label");
       fromLabel.innerText = time(from.value);
-
+      fromLabel.style.left = `${(from.value / from.max) * 100}%`;
       from.addEventListener("input", () => {
         allVideos.forEach((video) => video.pause());
         fromLabel.innerText = time(from.value);
+        fromLabel.style.left = `${(from.value / from.max) * 100}%`;
         videoObj.from = from.value;
         updateObj(placeholder, videoObj, masterObj);
         video.currentTime = from.value;
@@ -64,11 +61,11 @@ const controls = (files) => {
 
       const toLabel = wrapper.querySelector(".to-label");
       toLabel.innerText = time(to.value);
-      // toLabel.style.left = "calc(200px +200px)";
+      toLabel.style.left = `${(to.value / to.max) * 100}%`;
       to.addEventListener("input", () => {
         allVideos.forEach((video) => video.pause());
         toLabel.innerText = time(to.value);
-
+        toLabel.style.left = `${(to.value / to.max) * 100}%`;
         videoObj.to = to.value;
         updateObj(placeholder, videoObj, masterObj);
         video.currentTime = to.value - 2;
@@ -84,27 +81,42 @@ const controls = (files) => {
 
       // PAUSE
       const pause = wrapper.querySelector(".pause");
-      pause.addEventListener("click", () => {
-        video.pause();
-      });
+      pause.addEventListener("click", () => video.pause());
+
+      // DUPLICATE
+      // const duplicate = wrapper.querySelector(".duplicate");
+      // duplicate.addEventListener("click", () => {
+      //   // console.log(video);
+
+      //   const videoWrapper = video.closest(".video-wrapper");
+      //   const videoWrapperCopy = videoWrapper.cloneNode(true);
+      //   // console.log(videoWrapper);
+
+      //   videoWrapper.after(videoWrapperCopy);
+      // });
     };
   });
 };
 
-const getObj = (name) => {
-  const strFromStorage = localStorage.getItem(name);
+const getObj = (videoName) => {
+  const strFromStorage = localStorage.getItem(videoName);
 
   return strFromStorage
     ? JSON.parse(strFromStorage)
-    : { name, from: null, to: null };
+    : { videoName, from: null, to: null, order: null };
 };
 
 const updateObj = (placeholder, videoObj, masterObj) => {
   placeholder.innerText = JSON.stringify(videoObj, null, 2);
-  localStorage.setItem(videoObj.name, JSON.stringify(videoObj));
+  localStorage.setItem(videoObj.videoName, JSON.stringify(videoObj));
 
-  masterObj[videoObj.name] = videoObj;
-  console.log("masterObj", masterObj);
+  masterObj[videoObj.videoName] = videoObj;
+  // console.log("masterObj", masterObj);
+
+  const allVideosArray = Object.values(masterObj);
+  const allVideosArraySorted = allVideosArray.sort((a, b) => a.order - b.order);
+  document.getElementById("result").value =
+    JSON.stringify(allVideosArraySorted);
 };
 
 const time = (sec) => {
