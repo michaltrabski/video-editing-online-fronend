@@ -1,3 +1,12 @@
+const objTemplate = {
+  videoName: "",
+  from: null,
+  to: null,
+  order: null,
+  wholeVideoDuration: null,
+  trimedVideoDuration: null,
+};
+
 (() => {
   fetch("files.json")
     .then((res) => res.json())
@@ -36,42 +45,54 @@ const controls = (files) => {
       updateObj(placeholder, videoObj, masterObj);
       video.currentTime = videoObj.from;
 
-      // FROM
-      const from = wrapper.querySelector(".from");
-      from.value = videoObj.from || 0;
-      from.max = video.duration;
+      const { duration } = video;
+      videoObj.wholeVideoDuration = duration;
 
-      const fromLabel = wrapper.querySelector(".from-label");
-      fromLabel.innerText = time(from.value);
-      fromLabel.style.left = `${(from.value / from.max) * 100}%`;
-      from.addEventListener("input", () => {
-        allVideos.forEach((video) => video.pause());
+      ///////////////////////////////////////////////////////////
+      // FROM
+      {
+        const from = wrapper.querySelector(".from");
+        from.value = videoObj.from || 0;
+        from.max = duration;
+
+        const fromLabel = wrapper.querySelector(".from-label");
         fromLabel.innerText = time(from.value);
         fromLabel.style.left = `${(from.value / from.max) * 100}%`;
-        videoObj.from = from.value;
-        updateObj(placeholder, videoObj, masterObj);
-        video.currentTime = from.value;
-      });
-      from.addEventListener("click", () => video.play());
+        from.addEventListener("input", () => {
+          allVideos.forEach((video) => video.pause());
+          fromLabel.innerText = time(from.value);
+          fromLabel.style.left = `${(from.value / from.max) * 100}%`;
+          videoObj.from = from.value;
+          updateObj(placeholder, videoObj, masterObj);
+          video.currentTime = from.value;
+        });
+        from.addEventListener("click", () => video.play());
+      }
 
+      ///////////////////////////////////////////////////////////
       // TO
-      const to = wrapper.querySelector(".to");
-      to.value = videoObj.to || video.duration;
-      to.max = video.duration;
+      {
+        const to = wrapper.querySelector(".to");
+        to.value = videoObj.to || video.duration;
+        to.max = duration;
 
-      const toLabel = wrapper.querySelector(".to-label");
-      toLabel.innerText = time(to.value);
-      toLabel.style.left = `${(to.value / to.max) * 100}%`;
-      to.addEventListener("input", () => {
-        allVideos.forEach((video) => video.pause());
+        const toLabel = wrapper.querySelector(".to-label");
         toLabel.innerText = time(to.value);
         toLabel.style.left = `${(to.value / to.max) * 100}%`;
-        videoObj.to = to.value;
-        updateObj(placeholder, videoObj, masterObj);
-        video.currentTime = to.value - 2;
-      });
-      to.addEventListener("click", () => video.play());
+        to.addEventListener("input", () => {
+          allVideos.forEach((video) => video.pause());
 
+          const val = duration - to.value < 1 ? duration : to.value;
+          toLabel.innerText = time(val);
+          toLabel.style.left = `${(to.value / to.max) * 100}%`;
+          videoObj.to = val;
+          updateObj(placeholder, videoObj, masterObj);
+          video.currentTime = val - 2;
+        });
+        to.addEventListener("click", () => video.play());
+      }
+
+      ///////////////////////////////////////////////////////////
       // PLAY
       const play = wrapper.querySelector(".play");
       play.addEventListener("click", () => {
@@ -79,6 +100,7 @@ const controls = (files) => {
         video.play();
       });
 
+      ///////////////////////////////////////////////////////////
       // PAUSE
       const pause = wrapper.querySelector(".pause");
       pause.addEventListener("click", () => video.pause());
@@ -103,14 +125,17 @@ const getObj = (videoName) => {
 
   return strFromStorage
     ? JSON.parse(strFromStorage)
-    : { videoName, from: null, to: null, order: null };
+    : { ...objTemplate, videoName };
 };
 
 const updateObj = (placeholder, videoObj, masterObj) => {
-  placeholder.innerText = JSON.stringify(videoObj, null, 2);
-  localStorage.setItem(videoObj.videoName, JSON.stringify(videoObj));
+  const newVideoObj = { ...videoObj };
+  newVideoObj.trimedVideoDuration = newVideoObj.to - newVideoObj.from;
 
-  masterObj[videoObj.videoName] = videoObj;
+  placeholder.innerText = JSON.stringify(newVideoObj, null, 2);
+  localStorage.setItem(newVideoObj.videoName, JSON.stringify(newVideoObj));
+
+  masterObj[newVideoObj.videoName] = newVideoObj;
   // console.log("masterObj", masterObj);
 
   const allVideosArray = Object.values(masterObj);
@@ -122,5 +147,7 @@ const updateObj = (placeholder, videoObj, masterObj) => {
 const time = (sec) => {
   const minutes = Math.floor(sec / 60);
   const seconds = sec - minutes * 60;
-  return `${minutes}:${seconds}`;
+  return seconds < 10
+    ? `${minutes}:0${seconds.toFixed(1)}`
+    : `${minutes}:${seconds.toFixed(1)}`;
 };
